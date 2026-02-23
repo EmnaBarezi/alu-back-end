@@ -8,18 +8,17 @@ import requests
 
 
 if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        exit(1)
+
     employee_id = sys.argv[1]
 
-    # Get employee information
     user_url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
-    user_response = requests.get(user_url)
-    user_data = user_response.json()
+    user_data = requests.get(user_url).json()
     employee_name = user_data.get("name")
 
-    # Get TODO list
     todos_url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(employee_id)
-    todos_response = requests.get(todos_url)
-    todos_data = todos_response.json()
+    todos_data = requests.get(todos_url).json()
 
     total_tasks = len(todos_data)
     done_tasks = [task for task in todos_data if task.get("completed")]
