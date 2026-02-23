@@ -1,32 +1,41 @@
 #!/usr/bin/python3
 """
-Gather data from an API
+Gather data from a REST API
 """
 
-import sys
 import requests
+import sys
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        exit(1)
+def gather_data(employee_id):
+    """Fetch and display TODO list progress"""
 
-    employee_id = sys.argv[1]
+    base_url = "https://jsonplaceholder.typicode.com"
 
-    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(employee_id)
-    user_data = requests.get(user_url).json()
-    employee_name = user_data.get("name")
+    # Get employee data
+    user = requests.get(f"{base_url}/users/{employee_id}").json()
+    username = user.get("name")
 
-    todos_url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(employee_id)
-    todos_data = requests.get(todos_url).json()
+    # Get TODO list
+    todos = requests.get(f"{base_url}/todos", params={
+        "userId": employee_id
+    }).json()
 
-    total_tasks = len(todos_data)
-    done_tasks = [task for task in todos_data if task.get("completed")]
-    number_done = len(done_tasks)
+    total_tasks = len(todos)
 
-    print("Employee {} is done with tasks({}/{}):".format(
-        employee_name, number_done, total_tasks))
+    done_tasks = [task for task in todos if task.get("completed")]
 
+    print("Employee {} is done with tasks({}/{})".format(
+        username,
+        len(done_tasks),
+        total_tasks
+    ))
+
+    # Print completed tasks titles
     for task in done_tasks:
         print("\t {}".format(task.get("title")))
 
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        gather_data(int(sys.argv[1]))
